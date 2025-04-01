@@ -12,45 +12,24 @@ interface PreviewTabsProps {
 }
 
 export default function PreviewTabs({ analysis }: PreviewTabsProps) {
-  // Add null check to ensure analysis exists and has all required properties
-  if (!analysis || !analysis.url) {
-    return null;
-  }
-  
-  // Destructure safely
-  const { 
-    url, 
-    title = '',
-    description = '',
-    ogTags = [],
-    twitterTags = [],
-    metaTags = []
-  } = analysis;
+  const { url, title, description, ogTags, twitterTags, metaTags } = analysis;
   
   // Format URL for display
   const displayUrl = url.replace(/^https?:\/\//, '');
   
-  // Get Open Graph values - with null safety
-  const ogTitle = ogTags && Array.isArray(ogTags) ? 
-    ogTags.find(tag => tag?.property === 'og:title')?.content || title || '' : '';
-  const ogDescription = ogTags && Array.isArray(ogTags) ? 
-    ogTags.find(tag => tag?.property === 'og:description')?.content || description || '' : '';
-  const ogImage = ogTags && Array.isArray(ogTags) ? 
-    ogTags.find(tag => tag?.property === 'og:image')?.content || '' : '';
+  // Get Open Graph values
+  const ogTitle = ogTags.find(tag => tag.property === 'og:title')?.content || title || '';
+  const ogDescription = ogTags.find(tag => tag.property === 'og:description')?.content || description || '';
+  const ogImage = ogTags.find(tag => tag.property === 'og:image')?.content || '';
   
-  // Get Twitter Card values - with null safety
-  const twitterTitle = twitterTags && Array.isArray(twitterTags) ? 
-    twitterTags.find(tag => tag?.name === 'twitter:title')?.content || ogTitle : '';
-  const twitterDescription = twitterTags && Array.isArray(twitterTags) ? 
-    twitterTags.find(tag => tag?.name === 'twitter:description')?.content || ogDescription : '';
-  const twitterImage = twitterTags && Array.isArray(twitterTags) ? 
-    twitterTags.find(tag => tag?.name === 'twitter:image')?.content || ogImage : '';
+  // Get Twitter Card values
+  const twitterTitle = twitterTags.find(tag => tag.name === 'twitter:title')?.content || ogTitle;
+  const twitterDescription = twitterTags.find(tag => tag.name === 'twitter:description')?.content || ogDescription;
+  const twitterImage = twitterTags.find(tag => tag.name === 'twitter:image')?.content || ogImage;
   
-  // Meta tag score calculation - with null safety
-  const titleScore = metaTags && Array.isArray(metaTags) ? 
-    metaTags.find(tag => tag?.name === 'Title')?.score || 0 : 0;
-  const descriptionScore = metaTags && Array.isArray(metaTags) ? 
-    metaTags.find(tag => tag?.name === 'Description')?.score || 0 : 0;
+  // Meta tag score calculation
+  const titleScore = metaTags.find(tag => tag.name === 'Title')?.score || 0;
+  const descriptionScore = metaTags.find(tag => tag.name === 'Description')?.score || 0;
   const urlScore = 100; // We'll assume URLs are well-structured
 
   return (

@@ -6,22 +6,7 @@ interface DetailedAnalysisProps {
 }
 
 export default function DetailedAnalysis({ analysis }: DetailedAnalysisProps) {
-  // Add null check to handle null/undefined analysis
-  if (!analysis) {
-    return null;
-  }
-  
-  // Destructure safely with defaults
-  const { 
-    metaTags = [], 
-    ogTags = [], 
-    twitterTags = [] 
-  } = analysis;
-
-  // Ensure arrays are valid
-  const safeMetaTags = Array.isArray(metaTags) ? metaTags : [];
-  const safeOgTags = Array.isArray(ogTags) ? ogTags : [];
-  const safeTwitterTags = Array.isArray(twitterTags) ? twitterTags : [];
+  const { metaTags, ogTags, twitterTags } = analysis;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -33,21 +18,15 @@ export default function DetailedAnalysis({ analysis }: DetailedAnalysisProps) {
         </h3>
 
         <div className="space-y-4">
-          {safeMetaTags.length > 0 ? (
-            safeMetaTags.map((tag, index) => (
-              <MetaTagItem 
-                key={index}
-                name={tag.name} 
-                content={tag.content}
-                status={tag.status}
-                score={tag.score}
-              />
-            ))
-          ) : (
-            <div className="text-sm text-slate-600 italic p-3 bg-slate-50 rounded">
-              No meta tags found to analyze
-            </div>
-          )}
+          {metaTags.map((tag, index) => (
+            <MetaTagItem 
+              key={index}
+              name={tag.name} 
+              content={tag.content}
+              status={tag.status}
+              score={tag.score}
+            />
+          ))}
         </div>
       </div>
 
@@ -71,8 +50,8 @@ export default function DetailedAnalysis({ analysis }: DetailedAnalysisProps) {
               <h4 className="font-medium text-slate-700">Open Graph Tags</h4>
             </div>
             <div className="space-y-2">
-              {safeOgTags.length > 0 ? (
-                safeOgTags.map((tag, index) => (
+              {ogTags.length > 0 ? (
+                ogTags.map((tag, index) => (
                   <div key={index} className="flex text-sm">
                     <span className="w-24 flex-shrink-0 font-medium text-slate-600">
                       {tag.property.replace('og:', '')}
@@ -102,8 +81,8 @@ export default function DetailedAnalysis({ analysis }: DetailedAnalysisProps) {
               <h4 className="font-medium text-slate-700">Twitter Card Tags</h4>
             </div>
             <div className="space-y-2">
-              {safeTwitterTags.length > 0 ? (
-                safeTwitterTags.map((tag, index) => (
+              {twitterTags.length > 0 ? (
+                twitterTags.map((tag, index) => (
                   <div key={index} className="flex text-sm">
                     <span className={`w-24 flex-shrink-0 font-medium text-slate-600 ${
                       tag.name === 'twitter:image:alt' ? 'text-amber-500 flex items-center' : ''
