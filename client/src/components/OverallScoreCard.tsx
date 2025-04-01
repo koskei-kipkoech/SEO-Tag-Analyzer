@@ -146,13 +146,13 @@ export default function OverallScoreCard({ analysis, onReanalyze }: OverallScore
               <text 
                 x="18" 
                 y="22" 
-                fontSize="0.7rem" 
+                fontSize="0.9rem" 
                 fontWeight="bold" 
                 textAnchor="middle" 
                 alignmentBaseline="middle" 
                 fill="#334155"
               >
-                {score}/100
+                {score}
               </text>
             </svg>
           </div>
