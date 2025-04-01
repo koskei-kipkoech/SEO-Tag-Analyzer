@@ -93,23 +93,23 @@ export default function OverallScoreCard({ analysis, onReanalyze }: OverallScore
   const summaryItems = getSummaryItems();
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+    <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h2 className="text-xl font-bold text-slate-800 flex items-center">
-            <BarChart2 className="mr-2 h-5 w-5 text-primary" />
+          <h2 className="text-xl font-bold text-slate-800 flex flex-wrap items-center gap-2">
+            <BarChart2 className="h-5 w-5 text-primary" />
             SEO Analysis Results
-            <span className="ml-2 text-sm bg-slate-100 text-slate-600 px-2 py-1 rounded">
+            <span className="text-sm bg-slate-100 text-slate-600 px-2 py-1 rounded">
               {displayUrl}
             </span>
           </h2>
-          <p className="text-slate-600">
+          <p className="text-slate-600 text-sm mt-1">
             Last analyzed: {formatDate(analysisDate)}
           </p>
         </div>
         <Button
           variant="outline"
-          className="bg-slate-100 hover:bg-slate-200 text-slate-700"
+          className="bg-gradient-to-r from-slate-50 to-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200 shadow-sm"
           onClick={onReanalyze}
         >
           <RefreshCw className="mr-2 h-4 w-4" />
@@ -117,8 +117,8 @@ export default function OverallScoreCard({ analysis, onReanalyze }: OverallScore
         </Button>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-6">
-        <div className="flex-1 flex flex-col items-center justify-center p-6 bg-slate-50 rounded-lg">
+      <div className="flex flex-col sm:flex-row gap-6">
+        <div className="flex-1 flex flex-col items-center justify-center p-6 bg-gradient-to-b from-slate-50 to-white rounded-lg shadow-sm border border-slate-100">
           <div className="relative mb-4">
             <svg className="w-36 h-36" viewBox="0 0 36 36">
               <circle cx="18" cy="18" r="16" fill="none" stroke="#e2e8f0" strokeWidth="2"></circle>
@@ -156,7 +156,7 @@ export default function OverallScoreCard({ analysis, onReanalyze }: OverallScore
               </text>
             </svg>
           </div>
-          <h3 className="text-lg font-bold text-slate-800">
+          <h3 className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-700">
             Overall SEO Score
           </h3>
           <p className="text-sm text-slate-600 text-center mt-1">
@@ -165,11 +165,11 @@ export default function OverallScoreCard({ analysis, onReanalyze }: OverallScore
         </div>
 
         <div className="flex-1">
-          <h3 className="font-medium text-slate-800 mb-3">Quick Summary</h3>
-          <ul className="space-y-2">
+          <h3 className="font-medium text-slate-800 mb-3 pb-2 border-b border-slate-100">Quick Summary</h3>
+          <ul className="space-y-3">
             {summaryItems.map((item, index) => (
-              <li key={index} className="flex items-center">
-                <span className={`w-6 h-6 rounded-full bg-${getStatusColor(item.status)} text-white flex items-center justify-center text-xs mr-2`}>
+              <li key={index} className="flex items-start">
+                <span className={`flex-shrink-0 w-6 h-6 rounded-full bg-${getStatusColor(item.status)} text-white flex items-center justify-center text-xs mr-2 mt-0.5 shadow-sm`}>
                   {item.status === 'success' ? (
                     <CheckCircle className="h-4 w-4" />
                   ) : item.status === 'warning' ? (

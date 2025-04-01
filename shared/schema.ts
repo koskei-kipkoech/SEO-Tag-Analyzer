@@ -22,7 +22,7 @@ export const seoAnalyses = pgTable("seo_analyses", {
 
 // Define the schema for a user input - just a URL for now
 export const seoUrlSchema = z.object({
-  url: z.string().trim().url("Please enter a valid URL"),
+  url: z.string().trim().min(1, "URL is required"),
 });
 
 // Define types for meta tags
