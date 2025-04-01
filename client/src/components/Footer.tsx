@@ -36,7 +36,7 @@ export default function Footer() {
             </a>
           </div>
           <p className="text-sm text-slate-400">
-            © {new Date().getFullYear()} SEO Tag Analyzer. All rights reserved.
+            © {new Date().getFullYear()} Patrick's SEO Tag Analyzer. All rights reserved.
           </p>
         </div>
       </div>
