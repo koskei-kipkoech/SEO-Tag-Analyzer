@@ -10,6 +10,11 @@ interface DetailedAnalysisProps {
 }
 
 export default function DetailedAnalysis({ analysis }: DetailedAnalysisProps) {
+  // Check if analysis is defined
+  if (!analysis) {
+    return <div className="p-4 text-center">No analysis data available</div>;
+  }
+  
   // Safely ensure arrays are initialized
   const metaTags = analysis.metaTags || [];
   const ogTags = analysis.ogTags || [];

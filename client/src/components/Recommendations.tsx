@@ -15,7 +15,10 @@ interface RecommendationsProps {
 }
 
 export default function Recommendations({ recommendations }: RecommendationsProps) {
-  if (!recommendations || recommendations.length === 0) {
+  // Ensure recommendations is defined and handle empty arrays
+  const recommendationsList = recommendations || [];
+  
+  if (recommendationsList.length === 0) {
     return (
       <Card>
         <CardHeader>
@@ -42,9 +45,9 @@ export default function Recommendations({ recommendations }: RecommendationsProp
   }
   
   // Group recommendations by priority for filtering
-  const highPriorityRecs = recommendations.filter(rec => rec.priority === 'high');
-  const mediumPriorityRecs = recommendations.filter(rec => rec.priority === 'medium');
-  const lowPriorityRecs = recommendations.filter(rec => rec.priority === 'low');
+  const highPriorityRecs = recommendationsList.filter(rec => rec.priority === 'high');
+  const mediumPriorityRecs = recommendationsList.filter(rec => rec.priority === 'medium');
+  const lowPriorityRecs = recommendationsList.filter(rec => rec.priority === 'low');
   
   // Get impact count for each priority
   const highPriorityCount = highPriorityRecs.length;
@@ -52,7 +55,7 @@ export default function Recommendations({ recommendations }: RecommendationsProp
   const lowPriorityCount = lowPriorityRecs.length;
   
   // Calculate completion percentage
-  const totalIssues = recommendations.length;
+  const totalIssues = recommendationsList.length;
   const maxPossibleIssues = 10; // Assuming this is the worst case
   const completionPercentage = Math.max(0, Math.min(100, 100 - (totalIssues / maxPossibleIssues) * 100));
   
@@ -69,7 +72,7 @@ export default function Recommendations({ recommendations }: RecommendationsProp
             mediumPriorityCount > 0 ? 'bg-amber-50 text-amber-700' : 
             'bg-blue-50 text-blue-700'
           }`}>
-            {recommendations.length} issues found
+            {recommendationsList.length} issues found
           </Badge>
         </div>
       </CardHeader>
@@ -143,7 +146,7 @@ export default function Recommendations({ recommendations }: RecommendationsProp
         <Tabs defaultValue="all" className="w-full">
           <TabsList className="mb-4 grid grid-cols-4 bg-slate-100 p-1">
             <TabsTrigger value="all" className="text-xs data-[state=active]:bg-white data-[state=active]:shadow-sm">
-              All <Badge className="ml-1">{recommendations.length}</Badge>
+              All <Badge className="ml-1">{recommendationsList.length}</Badge>
             </TabsTrigger>
             <TabsTrigger value="high" className="text-xs data-[state=active]:bg-white data-[state=active]:shadow-sm">
               High <Badge variant="destructive" className="ml-1">{highPriorityCount}</Badge>
@@ -158,7 +161,7 @@ export default function Recommendations({ recommendations }: RecommendationsProp
           
           <TabsContent value="all" className="mt-0">
             <div className="grid grid-cols-1 gap-4">
-              {recommendations.map((rec, index) => (
+              {recommendationsList.map((rec, index) => (
                 <RecommendationCard key={index} recommendation={rec} />
               ))}
             </div>

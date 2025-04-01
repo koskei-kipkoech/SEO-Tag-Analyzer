@@ -11,6 +11,15 @@ interface OverallScoreCardProps {
 }
 
 export default function OverallScoreCard({ analysis, onReanalyze }: OverallScoreCardProps) {
+  // Check if analysis is undefined
+  if (!analysis) {
+    return (
+      <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
+        <p className="text-center">No analysis data available</p>
+      </div>
+    );
+  }
+  
   const { url, score, analysisDate } = analysis;
   
   // Safely ensure the arrays are initialized

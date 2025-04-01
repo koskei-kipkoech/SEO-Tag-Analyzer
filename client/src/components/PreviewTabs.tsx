@@ -12,7 +12,13 @@ interface PreviewTabsProps {
 }
 
 export default function PreviewTabs({ analysis }: PreviewTabsProps) {
-  const { url, title, description, ogTags, twitterTags, metaTags } = analysis;
+  // Safely extract values with default empty arrays/strings
+  const url = analysis?.url || '';
+  const title = analysis?.title || '';
+  const description = analysis?.description || '';
+  const ogTags = analysis?.ogTags || [];
+  const twitterTags = analysis?.twitterTags || [];
+  const metaTags = analysis?.metaTags || [];
   
   // Format URL for display
   const displayUrl = url.replace(/^https?:\/\//, '');
