@@ -9,6 +9,11 @@ interface OverallScoreCardProps {
 }
 
 export default function OverallScoreCard({ analysis, onReanalyze }: OverallScoreCardProps) {
+  // Add null check to ensure analysis exists and has the expected properties
+  if (!analysis || !analysis.url || !analysis.score || !analysis.analysisDate) {
+    return null;
+  }
+  
   const { url, score, analysisDate } = analysis;
   
   // Format the URL for display
@@ -27,69 +32,78 @@ export default function OverallScoreCard({ analysis, onReanalyze }: OverallScore
   const getSummaryItems = () => {
     const items = [];
     
-    // Check for title and description
-    const hasTitle = analysis.metaTags.some(tag => 
-      tag.name === 'Title' && tag.status === 'good');
-    const hasDescription = analysis.metaTags.some(tag => 
-      tag.name === 'Description' && tag.status === 'good');
-    
-    if (hasTitle && hasDescription) {
-      items.push({
-        status: 'success',
-        text: 'Title and description tags properly implemented'
-      });
-    }
-    
-    // Check for Open Graph tags
-    if (analysis.ogTags.length > 0) {
-      items.push({
-        status: 'success',
-        text: 'Open Graph tags present for social sharing'
-      });
-    } else {
-      items.push({
-        status: 'error',
-        text: 'Missing Open Graph tags for social sharing'
-      });
-    }
-    
-    // Check for Twitter Card tags
-    if (analysis.twitterTags.length > 0) {
-      const hasImageAlt = analysis.twitterTags.some(tag => 
-        tag.name === 'twitter:image:alt');
+    // Check for title and description - with null checks
+    if (analysis.metaTags && Array.isArray(analysis.metaTags)) {
+      const hasTitle = analysis.metaTags.some(tag => 
+        tag.name === 'Title' && tag.status === 'good');
+      const hasDescription = analysis.metaTags.some(tag => 
+        tag.name === 'Description' && tag.status === 'good');
       
-      if (!hasImageAlt) {
+      if (hasTitle && hasDescription) {
         items.push({
-          status: 'warning',
-          text: 'Twitter card meta tags missing image dimensions or alt text'
+          status: 'success',
+          text: 'Title and description tags properly implemented'
+        });
+      }
+    }
+    
+    // Check for Open Graph tags - with null checks
+    if (analysis.ogTags && Array.isArray(analysis.ogTags)) {
+      if (analysis.ogTags.length > 0) {
+        items.push({
+          status: 'success',
+          text: 'Open Graph tags present for social sharing'
         });
       } else {
         items.push({
-          status: 'success',
-          text: 'Twitter card meta tags properly implemented'
+          status: 'error',
+          text: 'Missing Open Graph tags for social sharing'
         });
       }
-    } else {
-      items.push({
-        status: 'error',
-        text: 'Missing Twitter Card meta tags'
-      });
     }
     
-    // Check for canonical URL
-    const hasCanonical = analysis.metaTags.some(tag => 
-      tag.name === 'Canonical URL' && tag.status === 'good');
+    // Check for Twitter Card tags - with null checks
+    if (analysis.twitterTags && Array.isArray(analysis.twitterTags)) {
+      if (analysis.twitterTags.length > 0) {
+        const hasImageAlt = analysis.twitterTags.some(tag => 
+          tag.name === 'twitter:image:alt');
+        
+        if (!hasImageAlt) {
+          items.push({
+            status: 'warning',
+            text: 'Twitter card meta tags missing image dimensions or alt text'
+          });
+        } else {
+          items.push({
+            status: 'success',
+            text: 'Twitter card meta tags properly implemented'
+          });
+        }
+      } else {
+        items.push({
+          status: 'error',
+          text: 'Missing Twitter Card meta tags'
+        });
+      }
+    }
     
-    if (!hasCanonical) {
-      items.push({
-        status: 'error',
-        text: 'Missing canonical URL tag for duplicate content prevention'
-      });
+    // Check for canonical URL - with null checks
+    if (analysis.metaTags && Array.isArray(analysis.metaTags)) {
+      const hasCanonical = analysis.metaTags.some(tag => 
+        tag.name === 'Canonical URL' && tag.status === 'good');
+      
+      if (!hasCanonical) {
+        items.push({
+          status: 'error',
+          text: 'Missing canonical URL tag for duplicate content prevention'
+        });
+      }
     }
     
     return items.slice(0, 4); // Limit to 4 items
   };
   
+  // Make sure to add null check
   const summaryItems = getSummaryItems();
 
   return (

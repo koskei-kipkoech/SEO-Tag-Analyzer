@@ -11,6 +11,10 @@ interface ResultsContainerProps {
 
 export default function ResultsContainer({ analysis, onReanalyze }: ResultsContainerProps) {
   if (!analysis) return null;
+  
+  // Make sure recommendations is an array before passing it
+  const recommendations = analysis.recommendations && Array.isArray(analysis.recommendations) ? 
+    analysis.recommendations : [];
 
   return (
     <div className="space-y-8 mb-12">
@@ -20,7 +24,7 @@ export default function ResultsContainer({ analysis, onReanalyze }: ResultsConta
       />
       <PreviewTabs analysis={analysis} />
       <DetailedAnalysis analysis={analysis} />
-      <Recommendations recommendations={analysis.recommendations} />
+      <Recommendations recommendations={recommendations} />
     </div>
   );
 }
