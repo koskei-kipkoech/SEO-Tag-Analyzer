@@ -1,7 +1,9 @@
 import { type SeoAnalysisResult } from "@shared/schema";
-import { BarChart2, RefreshCw, CheckCircle, AlertCircle, XCircle } from "lucide-react";
+import { BarChart2, RefreshCw, CheckCircle, AlertCircle, XCircle, HelpCircle, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/seoAnalysis";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 
 interface OverallScoreCardProps {
   analysis: SeoAnalysisResult;
@@ -10,6 +12,12 @@ interface OverallScoreCardProps {
 
 export default function OverallScoreCard({ analysis, onReanalyze }: OverallScoreCardProps) {
   const { url, score, analysisDate } = analysis;
+  
+  // Safely ensure the arrays are initialized
+  const metaTags = analysis.metaTags || [];
+  const ogTags = analysis.ogTags || [];
+  const twitterTags = analysis.twitterTags || [];
+  const recommendations = analysis.recommendations || [];
   
   // Format the URL for display
   const displayUrl = url.replace(/^https?:\/\//, '').replace(/\/$/, '');
@@ -28,9 +36,9 @@ export default function OverallScoreCard({ analysis, onReanalyze }: OverallScore
     const items = [];
     
     // Check for title and description
-    const hasTitle = analysis.metaTags.some(tag => 
+    const hasTitle = metaTags.some(tag => 
       tag.name === 'Title' && tag.status === 'good');
-    const hasDescription = analysis.metaTags.some(tag => 
+    const hasDescription = metaTags.some(tag => 
       tag.name === 'Description' && tag.status === 'good');
     
     if (hasTitle && hasDescription) {
@@ -41,7 +49,7 @@ export default function OverallScoreCard({ analysis, onReanalyze }: OverallScore
     }
     
     // Check for Open Graph tags
-    if (analysis.ogTags.length > 0) {
+    if (ogTags.length > 0) {
       items.push({
         status: 'success',
         text: 'Open Graph tags present for social sharing'
@@ -54,8 +62,8 @@ export default function OverallScoreCard({ analysis, onReanalyze }: OverallScore
     }
     
     // Check for Twitter Card tags
-    if (analysis.twitterTags.length > 0) {
-      const hasImageAlt = analysis.twitterTags.some(tag => 
+    if (twitterTags.length > 0) {
+      const hasImageAlt = twitterTags.some(tag => 
         tag.name === 'twitter:image:alt');
       
       if (!hasImageAlt) {
@@ -77,7 +85,7 @@ export default function OverallScoreCard({ analysis, onReanalyze }: OverallScore
     }
     
     // Check for canonical URL
-    const hasCanonical = analysis.metaTags.some(tag => 
+    const hasCanonical = metaTags.some(tag => 
       tag.name === 'Canonical URL' && tag.status === 'good');
     
     if (!hasCanonical) {
@@ -92,6 +100,17 @@ export default function OverallScoreCard({ analysis, onReanalyze }: OverallScore
   
   const summaryItems = getSummaryItems();
 
+  // Calculate counts for each status type
+  const goodCount = metaTags.filter(tag => tag.status === 'good').length;
+  const warningCount = metaTags.filter(tag => tag.status === 'warning').length;
+  const errorCount = metaTags.filter(tag => tag.status === 'error').length;
+  const totalTags = goodCount + warningCount + errorCount;
+
+  // Calculate percentages for the status breakdown
+  const goodPercentage = totalTags > 0 ? Math.round((goodCount / totalTags) * 100) : 0;
+  const warningPercentage = totalTags > 0 ? Math.round((warningCount / totalTags) * 100) : 0;
+  const errorPercentage = totalTags > 0 ? Math.round((errorCount / totalTags) * 100) : 0;
+
   return (
     <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
@@ -99,12 +118,17 @@ export default function OverallScoreCard({ analysis, onReanalyze }: OverallScore
           <h2 className="text-xl font-bold text-slate-800 flex flex-wrap items-center gap-2">
             <BarChart2 className="h-5 w-5 text-primary" />
             SEO Analysis Results
-            <span className="text-sm bg-slate-100 text-slate-600 px-2 py-1 rounded">
+            <Badge variant="outline" className="font-normal">
               {displayUrl}
-            </span>
+            </Badge>
           </h2>
-          <p className="text-slate-600 text-sm mt-1">
-            Last analyzed: {formatDate(analysisDate)}
+          <p className="text-slate-600 text-sm mt-1 flex items-center">
+            <span className="mr-3">Last analyzed: {formatDate(analysisDate)}</span>
+            {recommendations.length > 0 && (
+              <Badge variant="secondary" className="bg-amber-50 text-amber-700 hover:bg-amber-100">
+                {recommendations.length} recommendations
+              </Badge>
+            )}
           </p>
         </div>
         <Button
@@ -120,7 +144,8 @@ export default function OverallScoreCard({ analysis, onReanalyze }: OverallScore
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="flex flex-col p-6 bg-gradient-to-r from-slate-50 to-white rounded-lg shadow-sm border border-slate-100">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-700">
+            <h3 className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-700 flex items-center">
+              <Sparkles className="h-5 w-5 mr-2 text-primary" />
               SEO Score
             </h3>
             <div 
@@ -135,64 +160,61 @@ export default function OverallScoreCard({ analysis, onReanalyze }: OverallScore
           </div>
           
           <div className="mb-4">
-            <div className="w-full bg-slate-200 rounded-full h-2.5">
-              <div 
-                className={`h-2.5 rounded-full ${
-                  score >= 80 ? 'bg-green-500' : 
-                  score >= 60 ? 'bg-amber-500' : 
-                  'bg-red-500'
-                }`} 
-                style={{ width: `${score}%` }}
-              ></div>
-            </div>
+            <Progress 
+              value={score} 
+              className="h-2.5"
+              indicatorClassName={
+                score >= 80 ? 'bg-green-500' : 
+                score >= 60 ? 'bg-amber-500' : 
+                'bg-red-500'
+              }
+            />
           </div>
           
-          <p className="text-sm text-slate-700 mb-2">
+          <p className="text-sm text-slate-700 mb-4 bg-slate-50 p-3 rounded-md border border-slate-100">
             {getScoreDescription(score)}
           </p>
           
-          <div className="mt-2 pt-3 border-t border-slate-100">
-            <h4 className="text-sm font-medium text-slate-700 mb-2">SEO Summary:</h4>
-            <ul className="space-y-1.5 text-sm">
-              {analysis.metaTags.some(tag => tag.name === 'Title' && tag.status === 'good') ? (
-                <li className="flex items-center text-green-700">
-                  <CheckCircle className="h-3.5 w-3.5 mr-1.5" />Title tag is well-optimized
-                </li>
-              ) : (
-                <li className="flex items-center text-red-700">
-                  <XCircle className="h-3.5 w-3.5 mr-1.5" />Title tag needs improvement
-                </li>
-              )}
+          <div className="mt-2">
+            <h4 className="text-sm font-medium text-slate-700 mb-3">Status Breakdown:</h4>
+
+            <div className="space-y-3">
+              <StatusBar 
+                label="Good" 
+                count={goodCount}
+                percentage={goodPercentage}
+                color="bg-green-500" 
+                icon={<CheckCircle className="h-3.5 w-3.5" />}
+              />
               
-              {analysis.metaTags.some(tag => tag.name === 'Description' && tag.status === 'good') ? (
-                <li className="flex items-center text-green-700">
-                  <CheckCircle className="h-3.5 w-3.5 mr-1.5" />Description is well-written
-                </li>
-              ) : (
-                <li className="flex items-center text-red-700">
-                  <XCircle className="h-3.5 w-3.5 mr-1.5" />Description needs improvement
-                </li>
-              )}
+              <StatusBar 
+                label="Warning" 
+                count={warningCount}
+                percentage={warningPercentage}
+                color="bg-amber-500" 
+                icon={<AlertCircle className="h-3.5 w-3.5" />}
+              />
               
-              {analysis.ogTags.length > 0 ? (
-                <li className="flex items-center text-green-700">
-                  <CheckCircle className="h-3.5 w-3.5 mr-1.5" />Open Graph tags are present
-                </li>
-              ) : (
-                <li className="flex items-center text-red-700">
-                  <XCircle className="h-3.5 w-3.5 mr-1.5" />Missing Open Graph tags
-                </li>
-              )}
-            </ul>
+              <StatusBar 
+                label="Error" 
+                count={errorCount}
+                percentage={errorPercentage}
+                color="bg-red-500" 
+                icon={<XCircle className="h-3.5 w-3.5" />}
+              />
+            </div>
           </div>
         </div>
 
         <div className="flex flex-col p-6 bg-gradient-to-r from-slate-50 to-white rounded-lg shadow-sm border border-slate-100">
-          <h3 className="font-medium text-slate-800 mb-3 pb-2 border-b border-slate-100">Quick Summary</h3>
+          <h3 className="font-medium text-slate-800 mb-3 pb-2 border-b border-slate-100 flex items-center">
+            <HelpCircle className="h-4 w-4 mr-2 text-primary" />
+            Key Findings
+          </h3>
           <ul className="space-y-3">
             {summaryItems.map((item, index) => (
               <li key={index} className="flex items-start">
-                <span className={`flex-shrink-0 w-6 h-6 rounded-full bg-${getStatusColor(item.status)} text-white flex items-center justify-center text-xs mr-2 mt-0.5 shadow-sm`}>
+                <span className={`flex-shrink-0 w-6 h-6 rounded-full ${getStatusBackgroundColor(item.status)} text-white flex items-center justify-center text-xs mr-2 mt-0.5 shadow-sm`}>
                   {item.status === 'success' ? (
                     <CheckCircle className="h-4 w-4" />
                   ) : item.status === 'warning' ? (
@@ -211,19 +233,47 @@ export default function OverallScoreCard({ analysis, onReanalyze }: OverallScore
   );
 }
 
-// Helper function to get color based on score
-function getScoreColor(score: number): string {
-  if (score >= 80) return '#22c55e'; // success
-  if (score >= 60) return '#f59e0b'; // warning
-  return '#ef4444'; // error
+// Status Bar component
+interface StatusBarProps {
+  label: string;
+  count: number;
+  percentage: number;
+  color: string;
+  icon: React.ReactNode;
 }
 
-// Helper function to get color based on status
-function getStatusColor(status: string): string {
+function StatusBar({ label, count, percentage, color, icon }: StatusBarProps) {
+  return (
+    <div className="flex flex-col space-y-1">
+      <div className="flex justify-between items-center text-xs">
+        <div className="flex items-center">
+          <span className={`w-4 h-4 ${color} rounded-full flex items-center justify-center text-white mr-1.5`}>
+            {icon}
+          </span>
+          <span className="font-medium text-slate-700">{label}</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <span className="text-slate-500">{count}</span>
+          <span className="text-slate-400">·</span>
+          <span className="font-medium">{percentage}%</span>
+        </div>
+      </div>
+      <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+        <div 
+          className={`h-1.5 ${color} rounded-full`} 
+          style={{ width: `${percentage}%` }}
+        ></div>
+      </div>
+    </div>
+  );
+}
+
+// Helper function to get background color based on status
+function getStatusBackgroundColor(status: string): string {
   switch (status) {
-    case 'success': return 'success';
-    case 'warning': return 'warning';
-    case 'error': return 'error';
-    default: return 'slate-500';
+    case 'success': return 'bg-green-500';
+    case 'warning': return 'bg-amber-500';
+    case 'error': return 'bg-red-500';
+    default: return 'bg-slate-500';
   }
 }
