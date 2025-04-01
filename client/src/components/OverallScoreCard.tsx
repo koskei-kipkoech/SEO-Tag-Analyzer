@@ -117,54 +117,77 @@ export default function OverallScoreCard({ analysis, onReanalyze }: OverallScore
         </Button>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-6">
-        <div className="flex-1 flex flex-col items-center justify-center p-6 bg-gradient-to-b from-slate-50 to-white rounded-lg shadow-sm border border-slate-100">
-          <div className="relative mb-4">
-            <svg className="w-36 h-36" viewBox="0 0 36 36">
-              <circle cx="18" cy="18" r="16" fill="none" stroke="#e2e8f0" strokeWidth="2"></circle>
-              <circle 
-                cx="18" 
-                cy="18" 
-                r="16" 
-                fill="none" 
-                stroke={getScoreColor(score)} 
-                strokeWidth="2" 
-                strokeDasharray={`${score} 100`} 
-                strokeDashoffset="0" 
-                transform="rotate(-90 18 18)"
-              ></circle>
-              <text 
-                x="18" 
-                y="18" 
-                fontSize="0.6rem" 
-                textAnchor="middle" 
-                alignmentBaseline="middle" 
-                fill="#64748b"
-              >
-                SCORE
-              </text>
-              <text 
-                x="18" 
-                y="22" 
-                fontSize="0.9rem" 
-                fontWeight="bold" 
-                textAnchor="middle" 
-                alignmentBaseline="middle" 
-                fill="#334155"
-              >
-                {score}
-              </text>
-            </svg>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="flex flex-col p-6 bg-gradient-to-r from-slate-50 to-white rounded-lg shadow-sm border border-slate-100">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-700">
+              SEO Score
+            </h3>
+            <div 
+              className={`text-2xl font-bold rounded-lg px-4 py-2 ${
+                score >= 80 ? 'bg-green-100 text-green-700' : 
+                score >= 60 ? 'bg-amber-100 text-amber-700' : 
+                'bg-red-100 text-red-700'
+              }`}
+            >
+              {score}
+            </div>
           </div>
-          <h3 className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-700">
-            Overall SEO Score
-          </h3>
-          <p className="text-sm text-slate-600 text-center mt-1">
+          
+          <div className="mb-4">
+            <div className="w-full bg-slate-200 rounded-full h-2.5">
+              <div 
+                className={`h-2.5 rounded-full ${
+                  score >= 80 ? 'bg-green-500' : 
+                  score >= 60 ? 'bg-amber-500' : 
+                  'bg-red-500'
+                }`} 
+                style={{ width: `${score}%` }}
+              ></div>
+            </div>
+          </div>
+          
+          <p className="text-sm text-slate-700 mb-2">
             {getScoreDescription(score)}
           </p>
+          
+          <div className="mt-2 pt-3 border-t border-slate-100">
+            <h4 className="text-sm font-medium text-slate-700 mb-2">SEO Summary:</h4>
+            <ul className="space-y-1.5 text-sm">
+              {analysis.metaTags.some(tag => tag.name === 'Title' && tag.status === 'good') ? (
+                <li className="flex items-center text-green-700">
+                  <CheckCircle className="h-3.5 w-3.5 mr-1.5" />Title tag is well-optimized
+                </li>
+              ) : (
+                <li className="flex items-center text-red-700">
+                  <XCircle className="h-3.5 w-3.5 mr-1.5" />Title tag needs improvement
+                </li>
+              )}
+              
+              {analysis.metaTags.some(tag => tag.name === 'Description' && tag.status === 'good') ? (
+                <li className="flex items-center text-green-700">
+                  <CheckCircle className="h-3.5 w-3.5 mr-1.5" />Description is well-written
+                </li>
+              ) : (
+                <li className="flex items-center text-red-700">
+                  <XCircle className="h-3.5 w-3.5 mr-1.5" />Description needs improvement
+                </li>
+              )}
+              
+              {analysis.ogTags.length > 0 ? (
+                <li className="flex items-center text-green-700">
+                  <CheckCircle className="h-3.5 w-3.5 mr-1.5" />Open Graph tags are present
+                </li>
+              ) : (
+                <li className="flex items-center text-red-700">
+                  <XCircle className="h-3.5 w-3.5 mr-1.5" />Missing Open Graph tags
+                </li>
+              )}
+            </ul>
+          </div>
         </div>
 
-        <div className="flex-1">
+        <div className="flex flex-col p-6 bg-gradient-to-r from-slate-50 to-white rounded-lg shadow-sm border border-slate-100">
           <h3 className="font-medium text-slate-800 mb-3 pb-2 border-b border-slate-100">Quick Summary</h3>
           <ul className="space-y-3">
             {summaryItems.map((item, index) => (
